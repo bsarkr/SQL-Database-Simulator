@@ -1,6 +1,6 @@
 # SQL-Database-Sim
 
-This is a file-based SQL database simulator using c++.
+This is a file-based SQL database simulator implemented using c++.
 This is the final project of a Database course; however, it is entirely DIY.
 
 It will be compatible with the following SQL commands:
