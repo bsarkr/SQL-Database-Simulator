@@ -11,7 +11,6 @@ By Bilash Sarkar
 
 using namespace std;
 namespace fs = std::filesystem;
-//using namespace std::filesystem; //simplifying fs calls
 
 int main(){
 
