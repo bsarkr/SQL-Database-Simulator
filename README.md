@@ -3,6 +3,8 @@
 This is a file-based SQL database simulator implemented using C++ and Regex.
 This is the final project of a Database course; however, it is entirely DIY.
 
+Includes detailed notes for Regex usage to help myself learn the language.
+
 It will be compatible with the following SQL commands:
 
 CREATE TABLE tablename (colname1, colname2, colname3, etc.);
