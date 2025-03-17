@@ -11,6 +11,7 @@ This class parses user inputs
 #include <string>
 #include <vector>
 #include "createTable.cpp"
+#include "insertIntoTable.cpp"
 
 using namespace std;
 
@@ -25,10 +26,11 @@ void parseInputs(const string& input){
     // $ represents the end of the string
 
     regex createTableRegex(R"(^\s*CREATE\s+TABLE\s+(\w+)\s*\((.*?)\)\s*$)", regex::icase);
-
+    regex inputIntoTableRegex(R"(^\s*INSERT\s+INTO\s+(\w+)\s*VALUES\s*\((.*?)\)\s*$)", regex::icase);
 
     smatch match; //used to store the results of a regex search or match.
 
+    //CREATE TABLE regex parsing
     if(regex_match(input, match, createTableRegex)){ //checking if the input matches the regex structure created
 
         string tableName = match[1]; //extracting the table name
@@ -51,6 +53,33 @@ void parseInputs(const string& input){
         //now i can call the createTable function
         createTable(tableName, columnNames);
 
+    }
+    else if(regex_match(input, match, inputIntoTableRegex)){ //INSERT INTO regex parsing
+
+        string tableName = match[1]; //extracting the table name
+        string valuesStr = match[2]; //extracting column names (list)
+
+        //converting list into a vector
+        vector<string> values;
+
+        regex inputIntoTableRegex(R"(\s*,\s*)"); // locating a ',' to split the list into elements. The sytanx means that anything can be before or after the ','
+
+        //splitting the string into parts
+        sregex_token_iterator iter(valuesStr.cbegin(), valuesStr.cend(), inputIntoTableRegex, -1); //iterates through the entire list stores in columns var. Then, ehecks for the ','
+        sregex_token_iterator end;  //end of sequence                                     //the -1 means it grabs everything except the ','
+
+        while(iter != end){
+            string value = *iter;
+                values.push_back(value);
+            ++iter;
+        }
+
+        insertIntoTable(tableName, values);
+
+    }
+    else{
+        cout<<"There was something wrong with this command. Please check for syntax errors"<<endl;
+        return;
     }
 
 }

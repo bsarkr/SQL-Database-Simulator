@@ -1,1 +1,3 @@
-fname, lname, ID, SSN, Phone Number
+fname, lname, phone, email
+'bilash', 'sarkar', 9173876991, 'bsarkar@fordham.edu'
+'john', 'sharp', , 'js@gmail.com'

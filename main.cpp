@@ -10,7 +10,6 @@ This class simulates a SQL database
 #include <fstream>
 #include <filesystem>
 #include <string>
-#include "createTable.cpp"
 #include "parsing.cpp"
 
 using namespace std;

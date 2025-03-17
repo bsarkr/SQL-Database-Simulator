@@ -22,13 +22,8 @@ void createTable(const string& tableName, const vector<string>& column) //this f
     if(!fs::exists(databaseName)){ //is the database doesn't already exist..
         fs::create_directory(databaseName); //we create a new directory for it
     }
-    else{
-        cout<<"Oops! There was an error while creating this table. Ensure that a database was initialized before proceeding."<<endl;
-    }
-
     
     string filePath = "database/" + tableName+ ".txt"; //initializing new file destination
-
 
     //checking if tablename already exists
     if(fs::exists(filePath)){
@@ -36,10 +31,10 @@ void createTable(const string& tableName, const vector<string>& column) //this f
         return;
     }
 
-    ofstream tableFile(filePath); //creating new file based on destination
+    ofstream tableFile(filePath); //creating and opening the file
 
     if(!tableFile){ //checking if the file was successfully created
-        cout<<"Error creating table file!"<<endl;
+        cout<<"Oops! There was an error while creating this table. Ensure that a database was initialized before proceeding."<<endl;
         return;
     }
     
@@ -47,7 +42,7 @@ void createTable(const string& tableName, const vector<string>& column) //this f
 
         tableFile<<column[i]; //adding column name to our created table file
 
-        if(i < column.size()-1) tableFile<<", "; //seperating column names by a comma
+        if(i < column.size()-1) tableFile<<" , "; //seperating column names by a comma
 
     }
 
