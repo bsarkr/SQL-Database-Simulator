@@ -12,6 +12,7 @@ This class parses user inputs
 #include <vector>
 #include "createTable.cpp"
 #include "insertIntoTable.cpp"
+#include "select.cpp"
 
 using namespace std;
 
@@ -27,6 +28,8 @@ void parseInputs(const string& input){
 
     regex createTableRegex(R"(^\s*CREATE\s+TABLE\s+(\w+)\s*\((.*?)\)\s*$)", regex::icase);
     regex inputIntoTableRegex(R"(^\s*INSERT\s+INTO\s+(\w+)\s*VALUES\s*\((.*?)\)\s*$)", regex::icase);
+    regex selectAllRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s*$)", regex::icase);
+    regex selectColumnsRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s*$)", regex::icase);
 
     smatch match; //used to store the results of a regex search or match.
 
@@ -75,6 +78,34 @@ void parseInputs(const string& input){
         }
 
         insertIntoTable(tableName, values);
+
+    }
+    else if(regex_match(input, match, selectAllRegex)){
+        string tableName = match[1];
+        selectFrom(tableName, vector<string>{});       
+    }
+    else if(regex_match(input, match, selectColumnsRegex)){
+        string colNamesStr = match[1];
+        string tableName = match[2];
+
+        //cout<<tableName<<"====="<<colNamesStr<<endl; //this is not the problem
+
+        vector<string> selectedCols = split(colNamesStr);
+
+        /*
+        for(int i = 0; i<selectedCols.size(); i++){
+
+            cout<<selectedCols[i]<<" ";
+
+        }
+
+        for(string& col : selectedCols){
+            col.erase(0, col.find_first_not_of(" \t")); //trims leading spaces
+            col.erase(col.find_first_not_of(" \t") + 1); //trims remaining spaces
+        }
+            */
+
+        selectFrom(tableName, selectedCols);
 
     }
     else{
