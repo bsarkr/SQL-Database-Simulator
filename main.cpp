@@ -5,49 +5,77 @@ By Bilash Sarkar
 This class simulates a SQL database
 */
 
-
 #include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <algorithm> // Required for transform()
 #include "parsing.cpp"
 
 using namespace std;
 namespace fs = std::filesystem;
 
-int main(){
+int main() {
+    
+    string databaseName; //stores database name
+    bool databaseSelected = false;
 
-    //i'll change this to cin>> or something but i dont want it to ask everytime. *************** maybe prompt the user to select a database when starting? **********
-    string databaseName = "database"; //making the name a variable to enable future modification
+    while (!databaseSelected) {
+        cout << "Select a database: ";
+        cin >> databaseName;
+        cin.ignore(); //ignores leftover newline character
 
-    if(!fs::exists(databaseName)){ //is the database doesn't already exist..
-        fs::create_directory(databaseName); //we create a new directory for it
-        cout<<"New Database \"" <<databaseName<< "\" created!"<<endl;
+        if (!fs::exists(databaseName)) { //ff the database doesn't exist...
+
+            string response;
+
+            while (true) { //keep prompting until valid input
+                
+                cout << "\"" << databaseName << "\" does not currently exist.\nWould you like to create a new database? (yes/no): ";
+                getline(cin, response);
+
+                transform(response.begin(), response.end(), response.begin(), ::tolower); // Convert to lowercase for case insensitivity
+
+                if (response == "yes") {
+                    fs::create_directory(databaseName); //creates the new database directory
+                    cout << "New Database \"" << databaseName << "\" created!" << endl;
+                    databaseSelected = true; //breaks loop to continue
+                    break;
+                } 
+                else if (response == "no") {
+                    cout << "Please enter another database name." << endl;
+                    break; // Go back to asking for a database name
+                } 
+                else {
+                    cout << "Invalid input. Please enter \"yes\" or \"no\"." << endl;
+                }
+            }
+        } 
+        else { // If database already exists
+            cout << "\"" << databaseName << "\" exists." << endl;
+            databaseSelected = true;
+        }
     }
-    else{
-        cout<<"\""<<databaseName<<"\" exists"<<endl;
-    }
 
+    cout << "You've entered the database \"" << databaseName << "\"" << endl;
 
     string input; //for user inputs
 
-    //continously prompts user for a command.
-    while(true){ //all user calls are here
-        cout<<"> ";
+    //continuously prompts user for a command
+    while (true) {
+        cout << databaseName << " > ";
         getline(cin, input);
 
         string lowerCaseInput = input;
-        transform(lowerCaseInput.begin(), lowerCaseInput.end(), lowerCaseInput.begin(), ::tolower); //getting a lowercase version of input to check for case insensitve quit or exit
+        transform(lowerCaseInput.begin(), lowerCaseInput.end(), lowerCaseInput.begin(), ::tolower); //converts to lowercase for case-insensitive commands
 
-        if(lowerCaseInput == "quit" || lowerCaseInput == "exit"){ //stops programming when these keywords are detected
-            cout<<"Exiting Database Simulator"<<endl;
+        if (lowerCaseInput == "quit" || lowerCaseInput == "exit") { //exit condition
+            cout << "Exiting Database Simulator" << endl;
             break;
         }
 
-        parseInputs(input); //parses command, calling appropriate function 
+        parseInputs(input); //processes user input command
     }
-    
 
     return 0;
-
 }

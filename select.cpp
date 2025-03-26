@@ -290,7 +290,7 @@ void selectFromJoin(string& table1, string& table2, vector<string> selectedCols,
 
     cout << endl << string(colIndexes.size() * 23, '-') << endl; //prints separator line
 
-    //performs INNER JOIN and apply WHERE condition if needed
+    //performs JOIN and applys WHERE condition if needed
     for (auto& row1 : tableData1) {
         for (auto& row2 : tableData2) {
 

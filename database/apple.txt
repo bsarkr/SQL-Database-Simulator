@@ -1,0 +1,6 @@
+model , year , type
+macbook m4 , 2025 , laptop
+iphone 15 , 2023 , phone
+apple watch series 9) , 2024 , watch
+airpox max , 2020 , headphones
+apple watch series 10 , 2024 , watch

@@ -26,13 +26,13 @@ void parseInputs(const string& input){
     // *? means as few as possible (lazy matching)
     // $ represents the end of the string
 
-    regex createTableRegex(R"(^\s*CREATE\s+TABLE\s+(\w+)\s*\((.*?)\)\s*$)", regex::icase);
-    regex inputIntoTableRegex(R"(^\s*INSERT\s+INTO\s+(\w+)\s*VALUES\s*\((.*?)\)\s*$)", regex::icase);
-    regex selectAllRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s*$)", regex::icase);
-    regex selectColumnsRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s*$)", regex::icase);
-    regex selectAllWhereRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*$)", regex::icase);
-    regex selectColumnsWhereRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*$)", regex::icase);
-    regex selectJoinRegex(R"(^\s*SELECT\s+([\w\s, *]+)\s+FROM\s+(\w+)\s+JOIN\s+(\w+)\s+ON\s+(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)(?:\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+'))?\s*$)", regex::icase);
+    regex createTableRegex(R"(^\s*CREATE\s+TABLE\s+(\w+)\s*\((.*?)\)\s*(?:;\s*)?$)", regex::icase);
+    regex inputIntoTableRegex(R"(^\s*INSERT\s+INTO\s+(\w+)\s*VALUES\s*\((.*?)\)\s*(?:;\s*)?$)", regex::icase);
+    regex selectAllRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s*(?:;\s*)?$)", regex::icase);
+    regex selectColumnsRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s*(?:;\s*)?$)", regex::icase);
+    regex selectAllWhereRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*(?:;\s*)?$)", regex::icase);
+    regex selectColumnsWhereRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*(?:;\s*)?$)", regex::icase);
+    regex selectJoinRegex(R"(^\s*SELECT\s+([\w\s, *]+)\s+FROM\s+(\w+)\s+JOIN\s+(\w+)\s+ON\s+(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)(?:\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+'))?\s*(?:;\s*)?$)", regex::icase);
 
     smatch match; //used to store the results of a regex search or match.
 
@@ -91,8 +91,6 @@ void parseInputs(const string& input){
         string colNamesStr = match[1];
         string tableName = match[2];
 
-        //cout<<tableName<<"====="<<colNamesStr<<endl; //this is not the problem
-
         vector<string> selectedCols = split(colNamesStr);
 
         selectFrom(tableName, selectedCols);
@@ -126,8 +124,8 @@ void parseInputs(const string& input){
         string table1ColName = match[5];
         string table2Col = match[6];
         string table2ColName = match[7];
-        string whereCol = match[8];  // Optional
-        string whereVal = match[9];  // Optional
+        string whereCol = match[8];  //optional
+        string whereVal = match[9];  //optional
     
         vector<string> selectedCols = (selectedColsStr == "*") ? vector<string>{} : split(selectedColsStr);
     
