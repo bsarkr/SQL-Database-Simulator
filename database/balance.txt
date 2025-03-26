@@ -1,0 +1,3 @@
+phone , carrier , balance
+80080080008 , goatMobile , 100000000000
+9173876991 , 'mint' , 130

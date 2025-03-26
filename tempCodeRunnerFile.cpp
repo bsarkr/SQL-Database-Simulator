@@ -49,5 +49,25 @@ int main(){
     
 
     return 0;
+ 
+
+
+
+
+
+
+
+    
+    
+    //testing =================================
+
+    
+    vector<string> testCNames = {"fname", "lname", "ID", "SSN", "Phone Number"};
+    string tableName1 = "Students";
+
+    //createTable(tableName1, testCNames); //this works!!!!!
+
+
+    //testing end ==============================
 
 }

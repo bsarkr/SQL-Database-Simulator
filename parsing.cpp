@@ -30,6 +30,9 @@ void parseInputs(const string& input){
     regex inputIntoTableRegex(R"(^\s*INSERT\s+INTO\s+(\w+)\s*VALUES\s*\((.*?)\)\s*$)", regex::icase);
     regex selectAllRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s*$)", regex::icase);
     regex selectColumnsRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s*$)", regex::icase);
+    regex selectAllWhereRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*$)", regex::icase);
+    regex selectColumnsWhereRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*$)", regex::icase);
+    regex selectJoinRegex(R"(^\s*SELECT\s+([\w\s, *]+)\s+FROM\s+(\w+)\s+JOIN\s+(\w+)\s+ON\s+(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)(?:\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+'))?\s*$)", regex::icase);
 
     smatch match; //used to store the results of a regex search or match.
 
@@ -92,21 +95,43 @@ void parseInputs(const string& input){
 
         vector<string> selectedCols = split(colNamesStr);
 
-        /*
-        for(int i = 0; i<selectedCols.size(); i++){
-
-            cout<<selectedCols[i]<<" ";
-
-        }
-
-        for(string& col : selectedCols){
-            col.erase(0, col.find_first_not_of(" \t")); //trims leading spaces
-            col.erase(col.find_first_not_of(" \t") + 1); //trims remaining spaces
-        }
-            */
-
         selectFrom(tableName, selectedCols);
+    }
+    else if(regex_match(input, match, selectAllWhereRegex)){
 
+        string tableName = match[1];
+        string whereCol = match[2];
+        string whereVal = match[3];
+
+        selectFromWhere(tableName, vector<string>{}, whereCol, whereVal);
+
+    }
+    else if(regex_match(input, match, selectColumnsWhereRegex)){
+
+        string colNamesStr = match[1];
+        string tableName = match[2];
+        string whereCol = match[3]; 
+        string whereVal = match[4];  
+
+        vector<string> selectedCols = split(colNamesStr);
+
+        selectFromWhere(tableName, selectedCols, whereCol, whereVal);
+
+    }
+    else if (regex_match(input, match, selectJoinRegex)) {
+        string selectedColsStr = match[1];
+        string table1 = match[2];
+        string table2 = match[3];
+        string table1Col = match[4];
+        string table1ColName = match[5];
+        string table2Col = match[6];
+        string table2ColName = match[7];
+        string whereCol = match[8];  // Optional
+        string whereVal = match[9];  // Optional
+    
+        vector<string> selectedCols = (selectedColsStr == "*") ? vector<string>{} : split(selectedColsStr);
+    
+        selectFromJoin(table1, table2, selectedCols, table1ColName, table2ColName, whereCol, whereVal);
     }
     else{
         cout<<"There was something wrong with this command. Please check for syntax errors"<<endl;

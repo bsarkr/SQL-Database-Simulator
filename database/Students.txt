@@ -1,3 +1,6 @@
 fname, lname, phone, email
 'bilash', 'sarkar', 9173876991, 'bsarkar@fordham.edu'
-'john', 'sharp', , 'js@gmail.com'
+'Timothy' , 'Chalamet' , 8888888888 , 'tc@gmail.com'
+'Lebron' , 'James' , 8008008008 , 'theGOAT@goatmail.com'
+'john' , 'sharp' , 9999999999 , 'js@hotmail.com'
+'bilash' , 'sarkar' , 9173876991 , 'bsarkar1@gmail.com'

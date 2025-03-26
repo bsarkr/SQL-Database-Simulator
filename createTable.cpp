@@ -13,7 +13,7 @@ This class initializes a new table.
 using namespace std;
 namespace fs = std::filesystem;
 
-void createTable(const string& tableName, const vector<string>& column) //this funciton worksss!!!
+void createTable(const string& tableName, const vector<string>& column)
 {
     //temporary fix to making sure database is created before creating a table:
 
