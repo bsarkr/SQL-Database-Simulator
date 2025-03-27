@@ -33,13 +33,18 @@ vector<string> split(const string& str) {
     return result;
 }
 
-void selectFrom(string& tableName, const vector<string>& selectedColumns) {
+void selectFrom(string& databaseName,string& tableName, const vector<string>& selectedColumns) {
+
+    if(databaseName == ""){ //if database name is empty
+        cout<<"No databases selected"<<endl;
+        return;  
+    }
 
     //opens the table file for reading
-    ifstream file("database/" + tableName + ".txt");
+    ifstream file(databaseName + "/" + tableName + ".txt");
     if (!file) {
         //error message if the table does not exist
-        cout << "ERROR: Table \"" << tableName << "\" does not exist" << endl;
+        cout << "ERROR: Table \"" << tableName << "\" does not exist in database \"" << databaseName << "\"" << endl;
         return;
     }
 
@@ -91,12 +96,17 @@ void selectFrom(string& tableName, const vector<string>& selectedColumns) {
     file.close();
 }
 
-void selectFromWhere(string& tableName, const vector<string>& selectedColumns, const string& whereColumn, const string& whereValue) {
+void selectFromWhere(string& databaseName, string& tableName, const vector<string>& selectedColumns, const string& whereColumn, const string& whereValue) {
 
-    ifstream file("database/" + tableName + ".txt"); //opens the table file for reading
+    if(databaseName == ""){ //if database name is empty
+        cout<<"No databases selected"<<endl;
+        return;  
+    }
+
+    ifstream file(databaseName + "/" + tableName + ".txt"); //opens the table file for reading
 
     if (!file) { //check if the file exists
-        cout << "ERROR: Table \"" << tableName << "\" does not exist" << endl;
+        cout << "ERROR: Table \"" << tableName << "\" does not exist in database \"" << databaseName << "\"" << endl;
         return;
     }
 
@@ -191,11 +201,16 @@ void selectFromWhere(string& tableName, const vector<string>& selectedColumns, c
 
 
 
-void selectFromJoin(string& table1, string& table2, vector<string> selectedCols, string& joinCol1, string& joinCol2, string whereCol = "", string whereVal = "") {
+void selectFromJoin(string& databaseName, string& table1, string& table2, vector<string> selectedCols, string& joinCol1, string& joinCol2, string whereCol = "", string whereVal = "") {
     
+    if(databaseName == ""){ //if database name is empty
+        cout<<"No databases selected"<<endl;
+        return;  
+    }
+
     //opens the files for both tables
-    ifstream file1("database/" + table1 + ".txt");
-    ifstream file2("database/" + table2 + ".txt");
+    ifstream file1(databaseName + "/" + table1 + ".txt");
+    ifstream file2(databaseName + "/" + table2 + ".txt");
 
     if (!file1 || !file2) { //checks if files exist
         cout << "ERROR: One or both tables do not exist" << endl;

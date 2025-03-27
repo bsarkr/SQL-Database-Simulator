@@ -16,7 +16,7 @@ This class parses user inputs
 
 using namespace std;
 
-void parseInputs(const string& input){
+void parseInputs(const string& input, string& databaseName){
 
     // R"(...)" is where the we define the structure
     // regex::icase makes the input case insensitive, but the R"()"" makes sure that the exact keywords are used
@@ -33,6 +33,11 @@ void parseInputs(const string& input){
     regex selectAllWhereRegex(R"(^\s*SELECT\s+\*\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*(?:;\s*)?$)", regex::icase);
     regex selectColumnsWhereRegex(R"(^\s*SELECT\s+([\w\s,]+?)\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+')\s*(?:;\s*)?$)", regex::icase);
     regex selectJoinRegex(R"(^\s*SELECT\s+([\w\s, *]+)\s+FROM\s+(\w+)\s+JOIN\s+(\w+)\s+ON\s+(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)(?:\s+WHERE\s+(\w+)\s*=\s*(\d+|'[^']+'))?\s*(?:;\s*)?$)", regex::icase);
+    regex useDatabaseRegex(R"(^\s*USE\s+(\w+)\s*(?:;\s*)?$)", regex::icase);
+    regex showDatabasesRegex(R"(^\s*SHOW\s+DATABASES\s*(?:;\s*)?$)", regex::icase);
+    regex showTablesRegex(R"(^\s*SHOW\s+TABLES\s*$)", regex::icase);
+    regex createDatabaseRegex(R"(^\s*CREATE\s+DATABASE\s+(\w+)\s*(?:;\s*)?$)", regex::icase);
+    regex descTableRegex(R"(^\s*DESC\s+(\w+)\s*(?:;\s*)?$)", regex::icase);
 
     smatch match; //used to store the results of a regex search or match.
 
@@ -57,7 +62,7 @@ void parseInputs(const string& input){
         }
 
         //now i can call the createTable function
-        createTable(tableName, columnNames);
+        createTable(databaseName, tableName, columnNames);
 
     }
     else if(regex_match(input, match, inputIntoTableRegex)){ //INSERT INTO regex parsing
@@ -80,12 +85,12 @@ void parseInputs(const string& input){
             ++iter;
         }
 
-        insertIntoTable(tableName, values);
+        insertIntoTable(databaseName, tableName, values);
 
     }
     else if(regex_match(input, match, selectAllRegex)){
         string tableName = match[1];
-        selectFrom(tableName, vector<string>{});       
+        selectFrom(databaseName, tableName, vector<string>{});       
     }
     else if(regex_match(input, match, selectColumnsRegex)){
         string colNamesStr = match[1];
@@ -93,7 +98,7 @@ void parseInputs(const string& input){
 
         vector<string> selectedCols = split(colNamesStr);
 
-        selectFrom(tableName, selectedCols);
+        selectFrom(databaseName, tableName, selectedCols);
     }
     else if(regex_match(input, match, selectAllWhereRegex)){
 
@@ -101,7 +106,7 @@ void parseInputs(const string& input){
         string whereCol = match[2];
         string whereVal = match[3];
 
-        selectFromWhere(tableName, vector<string>{}, whereCol, whereVal);
+        selectFromWhere(databaseName, tableName, vector<string>{}, whereCol, whereVal);
 
     }
     else if(regex_match(input, match, selectColumnsWhereRegex)){
@@ -113,7 +118,7 @@ void parseInputs(const string& input){
 
         vector<string> selectedCols = split(colNamesStr);
 
-        selectFromWhere(tableName, selectedCols, whereCol, whereVal);
+        selectFromWhere(databaseName, tableName, selectedCols, whereCol, whereVal);
 
     }
     else if (regex_match(input, match, selectJoinRegex)) {
@@ -129,7 +134,66 @@ void parseInputs(const string& input){
     
         vector<string> selectedCols = (selectedColsStr == "*") ? vector<string>{} : split(selectedColsStr);
     
-        selectFromJoin(table1, table2, selectedCols, table1ColName, table2ColName, whereCol, whereVal);
+        selectFromJoin(databaseName, table1, table2, selectedCols, table1ColName, table2ColName, whereCol, whereVal);
+    }
+    else if(regex_match(input, match, useDatabaseRegex)){
+
+        //temp db match, to check if the database exists... this way i can change the current database appropriately
+
+        if(!fs::exists(databaseName)){ //is the database doesn't already exist..
+            cout<<"Database \""<<databaseName<<"\" does not exist"<<endl;
+            return; //make sure this doesn't create any issues.
+        }
+            
+        databaseName = match[1]; //updating current database bring used
+
+    }
+    else if (regex_match(input, match, showDatabasesRegex)) {
+        cout << "Databases:" << endl;
+        for (const auto& entry : fs::directory_iterator(".")) {
+            if (entry.is_directory()) {
+                cout << entry.path().filename().string() << endl;
+            }
+        }
+    }
+    else if (regex_match(input, match, showTablesRegex)) {
+
+        if(databaseName == ""){ //if database name is empty
+            cout<<"No databases selected"<<endl;
+            return;
+        }
+
+        cout << "Tables in database \"" << databaseName << "\":" << endl;
+        for (const auto& entry : fs::directory_iterator(databaseName)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".txt") {
+                cout << entry.path().stem().string() << endl;
+            }
+        }
+    }
+    else if(regex_match(input, match, createDatabaseRegex)){
+        databaseName = match[1];
+        fs::create_directory(databaseName); //creates the new database directory
+        cout << "New Database \"" << databaseName << "\" created!" << endl;
+    }
+    else if (regex_match(input, match, descTableRegex)) {
+
+        string tableName = match[1];
+        
+        if(databaseName == ""){ //if database name is empty
+            cout<<"No databases selected"<<endl;
+            return;
+        }
+
+        string filePath = databaseName + "/" + tableName + ".txt";
+        
+        ifstream file(filePath);
+        if (!file) {
+            cout << "Table \"" << tableName << "\" does not exist in database \"" << databaseName << "\"" << endl;
+            return;
+        }
+        string columns;
+        getline(file, columns);
+        cout << columns << endl;
     }
     else{
         cout<<"There was something wrong with this command. Please check for syntax errors"<<endl;

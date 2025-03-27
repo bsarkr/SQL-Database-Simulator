@@ -13,14 +13,19 @@ This class inserts data into a table
 using namespace std;
 namespace fs = std::filesystem;
 
-void insertIntoTable(const string& tableName, vector<string>& values){
+void insertIntoTable(string& databaseName, const string& tableName, vector<string>& values){
 
-    string filePath = "database/" + tableName + ".txt";
+    if(databaseName == ""){ //if database name is empty
+        cout<<"No databases selected"<<endl;
+        return;  
+    }
+
+    string filePath = databaseName + "/" + tableName + ".txt";
 
     ofstream tableFile(filePath, ios::app); //opening the table file in append mode
 
     if(!tableFile){ //checking if the file was successfully created
-        cout<<"Error: \""<<tableName<<"\" table does not exist"<<endl;
+        cout<<"Error: \""<<tableName<<"\" table does not exist in database \""<<databaseName<<"\""<<endl;
         return;
     }
 

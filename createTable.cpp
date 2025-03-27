@@ -13,21 +13,22 @@ This class initializes a new table.
 using namespace std;
 namespace fs = std::filesystem;
 
-void createTable(const string& tableName, const vector<string>& column)
+void createTable(string& databaseName, const string& tableName, const vector<string>& column)
 {
     //temporary fix to making sure database is created before creating a table:
 
-    string databaseName = "database"; //i need to pull this from the user... ****************
+    //string databaseName = "database"; //i need to pull this from the user... ****************
 
-    if(!fs::exists(databaseName)){ //is the database doesn't already exist..
-        fs::create_directory(databaseName); //we create a new directory for it
+    if(databaseName == ""){ //if database name is empty
+        cout<<"No databases selected"<<endl;
+        return;  
     }
     
-    string filePath = "database/" + tableName+ ".txt"; //initializing new file destination
+    string filePath = databaseName+ "/" + tableName+ ".txt"; //initializing new file destination
 
     //checking if tablename already exists
     if(fs::exists(filePath)){
-        cout<<"Error: \""<<tableName<<"\" already exists!"<<endl;
+        cout<<"Error: \""<<tableName<<"\" already exists in database \""<<databaseName<<"\"!"<<endl;
         return;
     }
 
@@ -52,4 +53,3 @@ void createTable(const string& tableName, const vector<string>& column)
     cout<<"Table \""<<tableName<<"\" created successfully"<<endl;
 
 }
-
