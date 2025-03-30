@@ -138,10 +138,10 @@ void parseInputs(const string& input, string& databaseName){
     }
     else if(regex_match(input, match, useDatabaseRegex)){
 
-        //temp db match, to check if the database exists... this way i can change the current database appropriately
+        string tempDB = match[1]; //checks if the database exists without changing the current database name
 
-        if(!fs::exists(databaseName)){ //is the database doesn't already exist..
-            cout<<"Database \""<<databaseName<<"\" does not exist"<<endl;
+        if(!fs::exists(tempDB)){ //if the database doesn't already exist..
+            cout<<"Database \""<<tempDB<<"\" does not exist"<<endl;
             return; //make sure this doesn't create any issues.
         }
             
@@ -149,9 +149,10 @@ void parseInputs(const string& input, string& databaseName){
 
     }
     else if (regex_match(input, match, showDatabasesRegex)) {
+
         cout << "Databases:" << endl;
         for (const auto& entry : fs::directory_iterator(".")) {
-            if (entry.is_directory()) {
+            if (entry.is_directory() && entry.path().filename().string() != ".git" && entry.path().filename().string() != ".vscode") { 
                 cout << entry.path().filename().string() << endl;
             }
         }
@@ -169,6 +170,7 @@ void parseInputs(const string& input, string& databaseName){
                 cout << entry.path().stem().string() << endl;
             }
         }
+
     }
     else if(regex_match(input, match, createDatabaseRegex)){
         databaseName = match[1];
